@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Response Viewer</title>
+</head>
+<body>
+    <h1>API PDF Generator</h1>
+    
+    <form id="pdfForm">
+        <label for="apiEndpoint">API Endpoint:</label><br>
+        <input type="text" id="apiEndpoint" name="apiEndpoint" placeholder="Enter the API endpoint URL" required><br><br>
+
+        <label for="jsonData">JSON Data:</label><br>
+        <textarea id="jsonData" name="jsonData" rows="10" cols="50" placeholder='{"key": "value"}' required></textarea><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="pdfViewer" style="display: none;">
+        <h2>PDF Output</h2>
+        <iframe id="pdfFrame" width="100%" height="500px"></iframe>
+    </div>
+
+    <script>
+        document.getElementById('pdfForm').addEventListener('submit', async function(event) {
+            event.preventDefault();  // Prevent form from reloading the page
+
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            const jsonData = document.getElementById('jsonData').value;
+
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: jsonData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob(); // Get the response as a blob
+                    const url = URL.createObjectURL(blob); // Create a URL for the blob
+                    
+                    // Display the PDF
+                    document.getElementById('pdfViewer').style.display = 'block';
+                    document.getElementById('pdfFrame').src = url;
+                } else {
+                    alert('Error: ' + response.statusText);
+                }
+            } catch (error) {
+                alert('Failed to fetch the PDF: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
